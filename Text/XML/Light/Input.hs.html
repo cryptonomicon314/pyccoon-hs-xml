@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>xml-1.3.14: Text/XML/Light/Input.hs</title>
+  <link rel="stylesheet" href="../../../pyccoon.css">
+</head>
+<body>
+<div id='container' >
+  <div id="footer">
+    <span id="project-name">
+        <a class="btn" href="../../../index.html">xml-1.3.14</a>
+    </span>
+    <a class="btn" class="source source-1" href="#top">Back to top</a>
+    <div class="generation-time">
+        Generated at
+        <code>2015-07-06 19:10</code>
+        by a diligent
+        <a target="_blank" href="http://ckald.github.io/pyccoon/" title="Pyccoon: side-to-side documentation generator">
+            <img id="pyccoon-icon" src="../../../pyccoon_icon.svg" alt="Pyccoon: side-to-side documentation generator" />pyccoon</a>
+    </div>
+  </div>
+  <a id="top"></a>
+  <div class='section'>
+    <div class='docs nav'>
+      <nav id="breadcrumbs">/ <a href="Input.hs.html/../../../../index.html">.</a> / <a href="Input.hs.html/../../../index.html">Text</a> / <a href="Input.hs.html/../../index.html">XML</a> / <a href="Input.hs.html/../index.html">Light</a> / Input.hs</nav>
+      <ul id="children"></ul>
+    </div>
+  </div>
+  <div id="everything" class='clearall'>
+    <div id="background"></div>
+    <div class='section'>
+    <a id="section-0" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-0'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p class="module-characteristic"><strong>Module</strong>: Text.XML.Light.Input</p><p class="module-characteristic"><strong>Copyright</strong>: (c) Galois, Inc. 2007</p><p class="module-characteristic"><strong>License</strong>: BSD3</p><p class="module-characteristic"><strong>Maintainer</strong>: Iavor S. Diatchki <diatchki@galois.com></p><p class="module-characteristic"><strong>Stability</strong>: provisional</p><p class="module-characteristic"><strong>Portability</strong>: portable</p>
+<p>Lightweight XML parsing</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="kr">module</span> <span class="nn">Text.XML.Light.Input</span> <span class="p">(</span><span class="nf">parseXML</span><span class="p">,</span><span class="nf">parseXMLDoc</span><span class="p">)</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Text.XML.Light.Lexer</span>
+<span class="kr">import</span> <span class="nn">Text.XML.Light.Types</span>
+<span class="kr">import</span> <span class="nn">Text.XML.Light.Proc</span>
+<span class="kr">import</span> <span class="nn">Text.XML.Light.Output</span><span class="p">(</span><span class="n">tagEnd</span><span class="p">)</span>
+
+<span class="kr">import</span> <span class="nn">Data.List</span><span class="p">(</span><span class="n">isPrefixOf</span><span class="p">)</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-1" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-1'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>parseXMLDoc, parse a XMLl document to maybe an element</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">parseXMLDoc</span>  <span class="ow">::</span> <span class="kt">XmlSource</span> <span class="n">s</span> <span class="ow">=&gt;</span> <span class="n">s</span> <span class="ow">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Element</span>
+<span class="nf">parseXMLDoc</span> <span class="n">xs</span>  <span class="ow">=</span> <span class="n">strip</span> <span class="p">(</span><span class="n">parseXML</span> <span class="n">xs</span><span class="p">)</span>
+  <span class="kr">where</span> <span class="n">strip</span> <span class="n">cs</span> <span class="ow">=</span> <span class="kr">case</span> <span class="n">onlyElems</span> <span class="n">cs</span> <span class="kr">of</span>
+                    <span class="n">e</span> <span class="kt">:</span> <span class="n">es</span>
+                      <span class="o">|</span> <span class="s">"?xml"</span> <span class="p">`</span><span class="n">isPrefixOf</span><span class="p">`</span> <span class="n">qName</span> <span class="p">(</span><span class="n">elName</span> <span class="n">e</span><span class="p">)</span>
+                          <span class="ow">-&gt;</span> <span class="n">strip</span> <span class="p">(</span><span class="n">map</span> <span class="kt">Elem</span> <span class="n">es</span><span class="p">)</span>
+                      <span class="o">|</span> <span class="n">otherwise</span> <span class="ow">-&gt;</span> <span class="kt">Just</span> <span class="n">e</span>
+                    <span class="kr">_</span> <span class="ow">-&gt;</span> <span class="kt">Nothing</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-2" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-2'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>parseXML to a list of content chunks</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">parseXML</span> <span class="ow">::</span> <span class="kt">XmlSource</span> <span class="n">s</span> <span class="ow">=&gt;</span> <span class="n">s</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="kt">Content</span><span class="p">]</span>
+<span class="nf">parseXML</span>  <span class="ow">=</span> <span class="n">parse</span> <span class="o">.</span> <span class="n">tokens</span>
+
+
+<span class="nf">parse</span>      <span class="ow">::</span> <span class="p">[</span><span class="kt">Token</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="kt">Content</span><span class="p">]</span>
+<span class="nf">parse</span> <span class="kt">[]</span>    <span class="ow">=</span> <span class="kt">[]</span>
+<span class="nf">parse</span> <span class="n">ts</span>    <span class="ow">=</span> <span class="kr">let</span> <span class="p">(</span><span class="n">es</span><span class="p">,</span><span class="kr">_</span><span class="p">,</span><span class="n">ts1</span><span class="p">)</span> <span class="ow">=</span> <span class="n">nodes</span> <span class="p">(</span><span class="kt">[]</span><span class="p">,</span><span class="kt">Nothing</span><span class="p">)</span> <span class="kt">[]</span> <span class="n">ts</span>
+              <span class="kr">in</span> <span class="n">es</span> <span class="o">++</span> <span class="n">parse</span> <span class="n">ts1</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-3" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-3'>#</a>
+          </div>
+          <p>Information about namespaces.
+The first component is a map that associates prefixes to URIs,
+the second is the URI for the default namespace, if one was provided.</p>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="kr">type</span> <span class="kt">NSInfo</span> <span class="ow">=</span> <span class="p">([(</span><span class="kt">String</span><span class="p">,</span><span class="kt">String</span><span class="p">)],</span><span class="kt">Maybe</span> <span class="kt">String</span><span class="p">)</span>
+
+<span class="nf">nodes</span> <span class="ow">::</span> <span class="kt">NSInfo</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="kt">QName</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="kt">Token</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">([</span><span class="kt">Content</span><span class="p">],</span> <span class="p">[</span><span class="kt">QName</span><span class="p">],</span> <span class="p">[</span><span class="kt">Token</span><span class="p">])</span>
+
+<span class="nf">nodes</span> <span class="n">ns</span> <span class="n">ps</span> <span class="p">(</span><span class="kt">TokCRef</span> <span class="n">ref</span> <span class="kt">:</span> <span class="n">ts</span><span class="p">)</span> <span class="ow">=</span>
+  <span class="kr">let</span> <span class="p">(</span><span class="n">es</span><span class="p">,</span><span class="n">qs</span><span class="p">,</span><span class="n">ts1</span><span class="p">)</span> <span class="ow">=</span> <span class="n">nodes</span> <span class="n">ns</span> <span class="n">ps</span> <span class="n">ts</span>
+  <span class="kr">in</span> <span class="p">(</span><span class="kt">CRef</span> <span class="n">ref</span> <span class="kt">:</span> <span class="n">es</span><span class="p">,</span> <span class="n">qs</span><span class="p">,</span> <span class="n">ts1</span><span class="p">)</span>
+
+<span class="nf">nodes</span> <span class="n">ns</span> <span class="n">ps</span> <span class="p">(</span><span class="kt">TokText</span> <span class="n">txt</span> <span class="kt">:</span> <span class="n">ts</span><span class="p">)</span> <span class="ow">=</span>
+  <span class="kr">let</span> <span class="p">(</span><span class="n">es</span><span class="p">,</span><span class="n">qs</span><span class="p">,</span><span class="n">ts1</span><span class="p">)</span> <span class="ow">=</span> <span class="n">nodes</span> <span class="n">ns</span> <span class="n">ps</span> <span class="n">ts</span>
+      <span class="p">(</span><span class="n">more</span><span class="p">,</span><span class="n">es1</span><span class="p">)</span>  <span class="ow">=</span> <span class="kr">case</span> <span class="n">es</span> <span class="kr">of</span>
+                      <span class="kt">Text</span> <span class="n">cd</span> <span class="kt">:</span> <span class="n">es1'</span>
+                        <span class="o">|</span> <span class="n">cdVerbatim</span> <span class="n">cd</span> <span class="o">==</span> <span class="n">cdVerbatim</span> <span class="n">txt</span> <span class="ow">-&gt;</span> <span class="p">(</span><span class="n">cdData</span> <span class="n">cd</span><span class="p">,</span><span class="n">es1'</span><span class="p">)</span>
+                      <span class="kr">_</span>                                   <span class="ow">-&gt;</span> <span class="p">(</span><span class="kt">[]</span><span class="p">,</span><span class="n">es</span><span class="p">)</span>
+
+  <span class="kr">in</span> <span class="p">(</span><span class="kt">Text</span> <span class="n">txt</span> <span class="p">{</span> <span class="n">cdData</span> <span class="ow">=</span> <span class="n">cdData</span> <span class="n">txt</span> <span class="o">++</span> <span class="n">more</span> <span class="p">}</span> <span class="kt">:</span> <span class="n">es1</span><span class="p">,</span> <span class="n">qs</span><span class="p">,</span> <span class="n">ts1</span><span class="p">)</span>
+
+<span class="nf">nodes</span> <span class="n">cur_info</span> <span class="n">ps</span> <span class="p">(</span><span class="kt">TokStart</span> <span class="n">p</span> <span class="n">t</span> <span class="n">as</span> <span class="n">empty</span> <span class="kt">:</span> <span class="n">ts</span><span class="p">)</span> <span class="ow">=</span> <span class="p">(</span><span class="n">node</span> <span class="kt">:</span> <span class="n">siblings</span><span class="p">,</span> <span class="n">open</span><span class="p">,</span> <span class="n">toks</span><span class="p">)</span>
+  <span class="kr">where</span>
+  <span class="n">new_name</span>  <span class="ow">=</span> <span class="n">annotName</span> <span class="n">new_info</span> <span class="n">t</span>
+  <span class="n">new_info</span>  <span class="ow">=</span> <span class="n">foldr</span> <span class="n">addNS</span> <span class="n">cur_info</span> <span class="n">as</span>
+  <span class="n">node</span>      <span class="ow">=</span> <span class="kt">Elem</span> <span class="kt">Element</span> <span class="p">{</span> <span class="n">elLine</span>    <span class="ow">=</span> <span class="kt">Just</span> <span class="n">p</span>
+                           <span class="p">,</span> <span class="n">elName</span>    <span class="ow">=</span> <span class="n">new_name</span>
+                           <span class="p">,</span> <span class="n">elAttribs</span> <span class="ow">=</span> <span class="n">map</span> <span class="p">(</span><span class="n">annotAttr</span> <span class="n">new_info</span><span class="p">)</span> <span class="n">as</span>
+                           <span class="p">,</span> <span class="n">elContent</span> <span class="ow">=</span> <span class="n">children</span>
+                           <span class="p">}</span>
+
+  <span class="p">(</span><span class="n">children</span><span class="p">,(</span><span class="n">siblings</span><span class="p">,</span><span class="n">open</span><span class="p">,</span><span class="n">toks</span><span class="p">))</span>
+    <span class="o">|</span> <span class="n">empty</span>     <span class="ow">=</span> <span class="p">(</span><span class="kt">[]</span><span class="p">,</span> <span class="n">nodes</span> <span class="n">cur_info</span> <span class="n">ps</span> <span class="n">ts</span><span class="p">)</span>
+    <span class="o">|</span> <span class="n">otherwise</span> <span class="ow">=</span> <span class="kr">let</span> <span class="p">(</span><span class="n">es1</span><span class="p">,</span><span class="n">qs1</span><span class="p">,</span><span class="n">ts1</span><span class="p">)</span> <span class="ow">=</span> <span class="n">nodes</span> <span class="n">new_info</span> <span class="p">(</span><span class="n">new_name</span><span class="kt">:</span><span class="n">ps</span><span class="p">)</span> <span class="n">ts</span>
+                  <span class="kr">in</span> <span class="p">(</span><span class="n">es1</span><span class="p">,</span>
+                      <span class="kr">case</span> <span class="n">qs1</span> <span class="kr">of</span>
+                        <span class="kt">[]</span> <span class="ow">-&gt;</span> <span class="n">nodes</span> <span class="n">cur_info</span> <span class="n">ps</span> <span class="n">ts1</span>
+                        <span class="kr">_</span> <span class="kt">:</span> <span class="n">qs3</span> <span class="ow">-&gt;</span> <span class="p">(</span><span class="kt">[]</span><span class="p">,</span><span class="n">qs3</span><span class="p">,</span><span class="n">ts1</span><span class="p">))</span>
+
+<span class="nf">nodes</span> <span class="n">ns</span> <span class="n">ps</span> <span class="p">(</span><span class="kt">TokEnd</span> <span class="n">p</span> <span class="n">t</span> <span class="kt">:</span> <span class="n">ts</span><span class="p">)</span>   <span class="ow">=</span> <span class="kr">let</span> <span class="n">t1</span> <span class="ow">=</span> <span class="n">annotName</span> <span class="n">ns</span> <span class="n">t</span>
+                                <span class="kr">in</span> <span class="kr">case</span> <span class="n">break</span> <span class="p">(</span><span class="n">t1</span> <span class="o">==</span><span class="p">)</span> <span class="n">ps</span> <span class="kr">of</span>
+                                  <span class="p">(</span><span class="n">as</span><span class="p">,</span><span class="kr">_</span><span class="kt">:</span><span class="kr">_</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="p">(</span><span class="kt">[]</span><span class="p">,</span><span class="n">as</span><span class="p">,</span><span class="n">ts</span><span class="p">)</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-4" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-4'>#</a>
+          </div>
+          <p>Unknown closing tag. Insert as text.</p>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre>                                  <span class="p">(</span><span class="kr">_</span><span class="p">,</span><span class="kt">[]</span><span class="p">)</span> <span class="ow">-&gt;</span>
+                                    <span class="kr">let</span> <span class="p">(</span><span class="n">es</span><span class="p">,</span><span class="n">qs</span><span class="p">,</span><span class="n">ts1</span><span class="p">)</span> <span class="ow">=</span> <span class="n">nodes</span> <span class="n">ns</span> <span class="n">ps</span> <span class="n">ts</span>
+                                    <span class="kr">in</span> <span class="p">(</span><span class="kt">Text</span> <span class="kt">CData</span> <span class="p">{</span>
+                                               <span class="n">cdLine</span> <span class="ow">=</span> <span class="kt">Just</span> <span class="n">p</span><span class="p">,</span>
+                                               <span class="n">cdVerbatim</span> <span class="ow">=</span> <span class="kt">CDataText</span><span class="p">,</span>
+                                               <span class="n">cdData</span> <span class="ow">=</span> <span class="n">tagEnd</span> <span class="n">t</span> <span class="s">""</span>
+                                              <span class="p">}</span> <span class="kt">:</span> <span class="n">es</span><span class="p">,</span><span class="n">qs</span><span class="p">,</span> <span class="n">ts1</span><span class="p">)</span>
+
+<span class="nf">nodes</span> <span class="kr">_</span> <span class="n">ps</span> <span class="kt">[]</span>                 <span class="ow">=</span> <span class="p">(</span><span class="kt">[]</span><span class="p">,</span><span class="n">ps</span><span class="p">,</span><span class="kt">[]</span><span class="p">)</span>
+
+
+<span class="nf">annotName</span> <span class="ow">::</span> <span class="kt">NSInfo</span> <span class="ow">-&gt;</span> <span class="kt">QName</span> <span class="ow">-&gt;</span> <span class="kt">QName</span>
+<span class="nf">annotName</span> <span class="p">(</span><span class="n">namespaces</span><span class="p">,</span><span class="n">def_ns</span><span class="p">)</span> <span class="n">n</span> <span class="ow">=</span>
+  <span class="n">n</span> <span class="p">{</span> <span class="n">qURI</span> <span class="ow">=</span> <span class="n">maybe</span> <span class="n">def_ns</span> <span class="p">(`</span><span class="n">lookup</span><span class="p">`</span> <span class="n">namespaces</span><span class="p">)</span> <span class="p">(</span><span class="n">qPrefix</span> <span class="n">n</span><span class="p">)</span> <span class="p">}</span>
+
+<span class="nf">annotAttr</span> <span class="ow">::</span> <span class="kt">NSInfo</span> <span class="ow">-&gt;</span> <span class="kt">Attr</span> <span class="ow">-&gt;</span> <span class="kt">Attr</span>
+<span class="nf">annotAttr</span> <span class="n">ns</span> <span class="n">a</span><span class="o">@</span><span class="p">(</span><span class="kt">Attr</span> <span class="p">{</span> <span class="n">attrKey</span> <span class="ow">=</span> <span class="n">k</span><span class="p">})</span> <span class="ow">=</span>
+  <span class="kr">case</span> <span class="p">(</span><span class="n">qPrefix</span> <span class="n">k</span><span class="p">,</span> <span class="n">qName</span> <span class="n">k</span><span class="p">)</span> <span class="kr">of</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-5" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-5'>#</a>
+          </div>
+          <p>Do not apply the default name-space to unqualified
+attributes.  See Section 6.2 of <a href="http://www.w3.org/TR/REC-xml-names">http://www.w3.org/TR/REC-xml-names</a>.</p>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre>    <span class="p">(</span><span class="kt">Nothing</span><span class="p">,</span> <span class="kr">_</span><span class="p">)</span>      <span class="ow">-&gt;</span> <span class="n">a</span>
+    <span class="kr">_</span>                 <span class="ow">-&gt;</span> <span class="n">a</span> <span class="p">{</span> <span class="n">attrKey</span> <span class="ow">=</span> <span class="n">annotName</span> <span class="n">ns</span> <span class="n">k</span> <span class="p">}</span>
+
+<span class="nf">addNS</span> <span class="ow">::</span> <span class="kt">Attr</span> <span class="ow">-&gt;</span> <span class="kt">NSInfo</span> <span class="ow">-&gt;</span> <span class="kt">NSInfo</span>
+<span class="nf">addNS</span> <span class="p">(</span><span class="kt">Attr</span> <span class="p">{</span> <span class="n">attrKey</span> <span class="ow">=</span> <span class="n">key</span><span class="p">,</span> <span class="n">attrVal</span> <span class="ow">=</span> <span class="n">val</span> <span class="p">})</span> <span class="p">(</span><span class="n">ns</span><span class="p">,</span><span class="n">def</span><span class="p">)</span> <span class="ow">=</span>
+  <span class="kr">case</span> <span class="p">(</span><span class="n">qPrefix</span> <span class="n">key</span><span class="p">,</span> <span class="n">qName</span> <span class="n">key</span><span class="p">)</span> <span class="kr">of</span>
+    <span class="p">(</span><span class="kt">Nothing</span><span class="p">,</span><span class="s">"xmlns"</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="p">(</span><span class="n">ns</span><span class="p">,</span> <span class="kr">if</span> <span class="n">null</span> <span class="n">val</span> <span class="kr">then</span> <span class="kt">Nothing</span> <span class="kr">else</span> <span class="kt">Just</span> <span class="n">val</span><span class="p">)</span>
+    <span class="p">(</span><span class="kt">Just</span> <span class="s">"xmlns"</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="kt">:</span> <span class="n">ns</span><span class="p">,</span> <span class="n">def</span><span class="p">)</span>
+    <span class="kr">_</span>                 <span class="ow">-&gt;</span> <span class="p">(</span><span class="n">ns</span><span class="p">,</span><span class="n">def</span><span class="p">)</span>
+
+</pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-endpage" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-'>#</a>
+          </div>
+          <p>
+            <div class="endpage"></div>
+          </p>
+        </div>
+        <div class='code'>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+  </div>
+</body>

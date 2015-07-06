@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title> documentation: XML/Light/Cursor.hs</title>
+  <link rel="stylesheet" href="../../pyccoon.css">
+</head>
+<body>
+<div id='container' >
+  <div id="footer">
+    <span id="project-name">
+        <a class="btn" href="../../index.html"> documentation</a>
+    </span>
+    <a class="btn" class="source source-1" href="#top">Back to top</a>
+    <div id="jump_to" class="btn">
+    Contents
+    <div id="jump_wrapper">
+      <div id="jump_page">
+          <a class="source source-2" href="#moving-around"> Moving around </a>
+          <a class="source source-2" href="#conversions"> Conversions </a>
+          <a class="source source-2" href="#queries"> Queries</a>
+          <a class="source source-2" href="#updates"> Updates</a>
+      </div>
+    </div>
+    </div>
+    <div class="generation-time">
+        Generated at
+        <code>2015-06-21 20:44</code>
+        by a diligent
+        <a target="_blank" href="http://ckald.github.io/pyccoon/" title="Pyccoon: side-to-side documentation generator">
+            <img id="pyccoon-icon" src="../../pyccoon_icon.svg" alt="Pyccoon: side-to-side documentation generator" />pyccoon</a>
+    </div>
+  </div>
+  <a id="top"></a>
+  <div class='section'>
+    <div class='docs nav'>
+      <nav id="breadcrumbs">/ <a href="Cursor.hs.html/../../../index.html">.</a> / <a href="Cursor.hs.html/../../index.html">XML</a> / <a href="Cursor.hs.html/../index.html">Light</a> / Cursor.hs</nav>
+      <ul id="children"></ul>
+    </div>
+  </div>
+  <div id="everything" class='clearall'>
+    <div id="background"></div>
+    <div class='section'>
+    <a id="section-0" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-0'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p class="module-characteristic"><strong>Module</strong>: Text.XML.Light.Cursor</p><p class="module-characteristic"><strong>Copyright</strong>: (c) Galois, Inc. 2008</p><p class="module-characteristic"><strong>License</strong>: BSD3</p><p class="module-characteristic"><strong>Maintainer</strong>: Iavor S. Diatchki <diatchki@galois.com></p><p class="module-characteristic"><strong>Stability</strong>: provisional</p><p class="module-characteristic"><strong>Portability</strong>: portable</p>
+<p>XML cursors for working XML content withing the context of an XML document. This implementation is based on the general tree zipper written by Krasimir Angelov and Iavor S. Diatchki.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="kr">module</span> <span class="nn">Text.XML.Light.Cursor</span>
+  <span class="p">(</span> <span class="kt">Tag</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="nf">getTag</span><span class="p">,</span> <span class="nf">setTag</span><span class="p">,</span> <span class="nf">fromTag</span>
+  <span class="p">,</span> <span class="kt">Cursor</span><span class="p">(</span><span class="o">..</span><span class="p">),</span> <span class="kt">Path</span>
+
+  <span class="c1">-- * Conversions</span>
+  <span class="p">,</span> <span class="nf">fromContent</span>
+  <span class="p">,</span> <span class="nf">fromElement</span>
+  <span class="p">,</span> <span class="nf">fromForest</span>
+  <span class="p">,</span> <span class="nf">toForest</span>
+  <span class="p">,</span> <span class="nf">toTree</span>
+
+  <span class="c1">-- * Moving around</span>
+  <span class="p">,</span> <span class="nf">parent</span>
+  <span class="p">,</span> <span class="nf">root</span>
+  <span class="p">,</span> <span class="nf">getChild</span>
+  <span class="p">,</span> <span class="nf">firstChild</span>
+  <span class="p">,</span> <span class="nf">lastChild</span>
+  <span class="p">,</span> <span class="nf">left</span>
+  <span class="p">,</span> <span class="nf">right</span>
+  <span class="p">,</span> <span class="nf">nextDF</span>
+
+  <span class="c1">-- ** Searching</span>
+  <span class="p">,</span> <span class="nf">findChild</span>
+  <span class="p">,</span> <span class="nf">findLeft</span>
+  <span class="p">,</span> <span class="nf">findRight</span>
+  <span class="p">,</span> <span class="nf">findRec</span>
+
+  <span class="c1">-- * Node classification</span>
+  <span class="p">,</span> <span class="nf">isRoot</span>
+  <span class="p">,</span> <span class="nf">isFirst</span>
+  <span class="p">,</span> <span class="nf">isLast</span>
+  <span class="p">,</span> <span class="nf">isLeaf</span>
+  <span class="p">,</span> <span class="nf">isChild</span>
+  <span class="p">,</span> <span class="nf">hasChildren</span>
+  <span class="p">,</span> <span class="nf">getNodeIndex</span>
+
+  <span class="c1">-- * Updates</span>
+  <span class="p">,</span> <span class="nf">setContent</span>
+  <span class="p">,</span> <span class="nf">modifyContent</span>
+  <span class="p">,</span> <span class="nf">modifyContentM</span>
+
+  <span class="c1">-- ** Inserting content</span>
+  <span class="p">,</span> <span class="nf">insertLeft</span>
+  <span class="p">,</span> <span class="nf">insertRight</span>
+  <span class="p">,</span> <span class="nf">insertGoLeft</span>
+  <span class="p">,</span> <span class="nf">insertGoRight</span>
+
+  <span class="c1">-- ** Removing content</span>
+  <span class="p">,</span> <span class="nf">removeLeft</span>
+  <span class="p">,</span> <span class="nf">removeRight</span>
+  <span class="p">,</span> <span class="nf">removeGoLeft</span>
+  <span class="p">,</span> <span class="nf">removeGoRight</span>
+  <span class="p">,</span> <span class="nf">removeGoUp</span>
+
+  <span class="p">)</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Text.XML.Light.Types</span>
+<span class="kr">import</span> <span class="nn">Data.Maybe</span><span class="p">(</span><span class="n">isNothing</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Control.Monad</span><span class="p">(</span><span class="n">mplus</span><span class="p">)</span>
+
+<span class="kr">data</span> <span class="kt">Tag</span> <span class="ow">=</span> <span class="kt">Tag</span> <span class="p">{</span> <span class="n">tagName</span>    <span class="ow">::</span> <span class="kt">QName</span>
+               <span class="p">,</span> <span class="n">tagAttribs</span> <span class="ow">::</span> <span class="p">[</span><span class="kt">Attr</span><span class="p">]</span>
+               <span class="p">,</span> <span class="n">tagLine</span>    <span class="ow">::</span> <span class="kt">Maybe</span> <span class="kt">Line</span>
+               <span class="p">}</span> <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Show</span><span class="p">)</span>
+
+<span class="nf">getTag</span> <span class="ow">::</span> <span class="kt">Element</span> <span class="ow">-&gt;</span> <span class="kt">Tag</span>
+<span class="nf">getTag</span> <span class="n">e</span> <span class="ow">=</span> <span class="kt">Tag</span> <span class="p">{</span> <span class="n">tagName</span> <span class="ow">=</span> <span class="n">elName</span> <span class="n">e</span>
+               <span class="p">,</span> <span class="n">tagAttribs</span> <span class="ow">=</span> <span class="n">elAttribs</span> <span class="n">e</span>
+               <span class="p">,</span> <span class="n">tagLine</span> <span class="ow">=</span> <span class="n">elLine</span> <span class="n">e</span>
+               <span class="p">}</span>
+
+<span class="nf">setTag</span> <span class="ow">::</span> <span class="kt">Tag</span> <span class="ow">-&gt;</span> <span class="kt">Element</span> <span class="ow">-&gt;</span> <span class="kt">Element</span>
+<span class="nf">setTag</span> <span class="n">t</span> <span class="n">e</span> <span class="ow">=</span> <span class="n">fromTag</span> <span class="n">t</span> <span class="p">(</span><span class="n">elContent</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="nf">fromTag</span> <span class="ow">::</span> <span class="kt">Tag</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="kt">Content</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="kt">Element</span>
+<span class="nf">fromTag</span> <span class="n">t</span> <span class="n">cs</span> <span class="ow">=</span> <span class="kt">Element</span> <span class="p">{</span> <span class="n">elName</span>    <span class="ow">=</span> <span class="n">tagName</span> <span class="n">t</span>
+                       <span class="p">,</span> <span class="n">elAttribs</span> <span class="ow">=</span> <span class="n">tagAttribs</span> <span class="n">t</span>
+                       <span class="p">,</span> <span class="n">elLine</span>    <span class="ow">=</span> <span class="n">tagLine</span> <span class="n">t</span>
+                       <span class="p">,</span> <span class="n">elContent</span> <span class="ow">=</span> <span class="n">cs</span>
+                       <span class="p">}</span>
+
+<span class="kr">type</span> <span class="kt">Path</span> <span class="ow">=</span> <span class="p">[([</span><span class="kt">Content</span><span class="p">],</span><span class="kt">Tag</span><span class="p">,[</span><span class="kt">Content</span><span class="p">])]</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-1" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-1'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>The position of a piece of content in an XML document.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="kr">data</span> <span class="kt">Cursor</span> <span class="ow">=</span> <span class="kt">Cur</span>
+  <span class="p">{</span> <span class="n">current</span> <span class="ow">::</span> <span class="kt">Content</span>      <span class="c1">-- ^ The currently selected content.</span>
+  <span class="p">,</span> <span class="n">lefts</span>   <span class="ow">::</span> <span class="p">[</span><span class="kt">Content</span><span class="p">]</span>    <span class="c1">-- ^ Siblings on the left, closest first.</span>
+  <span class="p">,</span> <span class="n">rights</span>  <span class="ow">::</span> <span class="p">[</span><span class="kt">Content</span><span class="p">]</span>    <span class="c1">-- ^ Siblings on the right, closest first.</span>
+  <span class="p">,</span> <span class="n">parents</span> <span class="ow">::</span> <span class="kt">Path</span> <span class="c1">-- ^ The contexts of the parent elements of this location.</span>
+  <span class="p">}</span> <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Show</span><span class="p">)</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-2" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-2'>#</a>
+          </div>
+          <h2><a id="moving-around" class="header-anchor" href="#moving-around"> Moving around </a></h2>
+        </div>
+        <div class='code'>
+          
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-3" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-3'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>The parent of the given location.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">parent</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Cursor</span>
+<span class="nf">parent</span> <span class="n">loc</span> <span class="ow">=</span>
+  <span class="kr">case</span> <span class="n">parents</span> <span class="n">loc</span> <span class="kr">of</span>
+    <span class="p">(</span><span class="n">pls</span><span class="p">,</span><span class="n">v</span><span class="p">,</span><span class="n">prs</span><span class="p">)</span> <span class="kt">:</span> <span class="n">ps</span> <span class="ow">-&gt;</span> <span class="kt">Just</span>
+      <span class="kt">Cur</span> <span class="p">{</span> <span class="n">current</span> <span class="ow">=</span> <span class="kt">Elem</span>
+                    <span class="p">(</span><span class="n">fromTag</span> <span class="n">v</span>
+                    <span class="p">(</span><span class="n">combChildren</span> <span class="p">(</span><span class="n">lefts</span> <span class="n">loc</span><span class="p">)</span> <span class="p">(</span><span class="n">current</span> <span class="n">loc</span><span class="p">)</span> <span class="p">(</span><span class="n">rights</span> <span class="n">loc</span><span class="p">)))</span>
+          <span class="p">,</span> <span class="n">lefts</span> <span class="ow">=</span> <span class="n">pls</span><span class="p">,</span> <span class="n">rights</span> <span class="ow">=</span> <span class="n">prs</span><span class="p">,</span> <span class="n">parents</span> <span class="ow">=</span> <span class="n">ps</span>
+          <span class="p">}</span>
+    <span class="kt">[]</span> <span class="ow">-&gt;</span> <span class="kt">Nothing</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-4" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-4'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>The top-most parent of the given location.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">root</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span>
+<span class="nf">root</span> <span class="n">loc</span> <span class="ow">=</span> <span class="n">maybe</span> <span class="n">loc</span> <span class="n">root</span> <span class="p">(</span><span class="n">parent</span> <span class="n">loc</span><span class="p">)</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-5" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-5'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>The left sibling of the given location.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">left</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Cursor</span>
+<span class="nf">left</span> <span class="n">loc</span> <span class="ow">=</span>
+  <span class="kr">case</span> <span class="n">lefts</span> <span class="n">loc</span> <span class="kr">of</span>
+    <span class="n">t</span> <span class="kt">:</span> <span class="n">ts</span> <span class="ow">-&gt;</span> <span class="kt">Just</span> <span class="n">loc</span> <span class="p">{</span> <span class="n">current</span> <span class="ow">=</span> <span class="n">t</span><span class="p">,</span> <span class="n">lefts</span> <span class="ow">=</span> <span class="n">ts</span>
+                                    <span class="p">,</span> <span class="n">rights</span> <span class="ow">=</span> <span class="n">current</span> <span class="n">loc</span> <span class="kt">:</span> <span class="n">rights</span> <span class="n">loc</span> <span class="p">}</span>
+    <span class="kt">[]</span>     <span class="ow">-&gt;</span> <span class="kt">Nothing</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-6" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-6'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>The right sibling of the given location.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">right</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Cursor</span>
+<span class="nf">right</span> <span class="n">loc</span> <span class="ow">=</span>
+  <span class="kr">case</span> <span class="n">rights</span> <span class="n">loc</span> <span class="kr">of</span>
+    <span class="n">t</span> <span class="kt">:</span> <span class="n">ts</span> <span class="ow">-&gt;</span> <span class="kt">Just</span> <span class="n">loc</span> <span class="p">{</span> <span class="n">current</span> <span class="ow">=</span> <span class="n">t</span><span class="p">,</span> <span class="n">lefts</span> <span class="ow">=</span> <span class="n">current</span> <span class="n">loc</span> <span class="kt">:</span> <span class="n">lefts</span> <span class="n">loc</span>
+                                    <span class="p">,</span> <span class="n">rights</span> <span class="ow">=</span> <span class="n">ts</span> <span class="p">}</span>
+    <span class="kt">[]</span>     <span class="ow">-&gt;</span> <span class="kt">Nothing</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-7" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-7'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>The first child of the given location.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">firstChild</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Cursor</span>
+<span class="nf">firstChild</span> <span class="n">loc</span> <span class="ow">=</span>
+  <span class="kr">do</span> <span class="p">(</span><span class="n">t</span> <span class="kt">:</span> <span class="n">ts</span><span class="p">,</span> <span class="n">ps</span><span class="p">)</span> <span class="ow">&lt;-</span> <span class="n">downParents</span> <span class="n">loc</span>
+     <span class="n">return</span> <span class="kt">Cur</span> <span class="p">{</span> <span class="n">current</span> <span class="ow">=</span> <span class="n">t</span><span class="p">,</span> <span class="n">lefts</span> <span class="ow">=</span> <span class="kt">[]</span><span class="p">,</span> <span class="n">rights</span> <span class="ow">=</span> <span class="n">ts</span> <span class="p">,</span> <span class="n">parents</span> <span class="ow">=</span> <span class="n">ps</span> <span class="p">}</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-8" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-8'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>The last child of the given location.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">lastChild</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Cursor</span>
+<span class="nf">lastChild</span> <span class="n">loc</span> <span class="ow">=</span>
+  <span class="kr">do</span> <span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">ps</span><span class="p">)</span> <span class="ow">&lt;-</span> <span class="n">downParents</span> <span class="n">loc</span>
+     <span class="kr">case</span> <span class="n">reverse</span> <span class="n">ts</span> <span class="kr">of</span>
+       <span class="n">l</span> <span class="kt">:</span> <span class="n">ls</span> <span class="ow">-&gt;</span> <span class="n">return</span> <span class="kt">Cur</span> <span class="p">{</span> <span class="n">current</span> <span class="ow">=</span> <span class="n">l</span><span class="p">,</span> <span class="n">lefts</span> <span class="ow">=</span> <span class="n">ls</span><span class="p">,</span> <span class="n">rights</span> <span class="ow">=</span> <span class="kt">[]</span>
+                                                     <span class="p">,</span> <span class="n">parents</span> <span class="ow">=</span> <span class="n">ps</span> <span class="p">}</span>
+       <span class="kt">[]</span> <span class="ow">-&gt;</span> <span class="kt">Nothing</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-9" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-9'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Find the next left sibling that satisfies a predicate.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">findLeft</span> <span class="ow">::</span> <span class="p">(</span><span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Bool</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Cursor</span>
+<span class="nf">findLeft</span> <span class="n">p</span> <span class="n">loc</span> <span class="ow">=</span> <span class="kr">do</span> <span class="n">loc1</span> <span class="ow">&lt;-</span> <span class="n">left</span> <span class="n">loc</span>
+                    <span class="kr">if</span> <span class="n">p</span> <span class="n">loc1</span> <span class="kr">then</span> <span class="n">return</span> <span class="n">loc1</span> <span class="kr">else</span> <span class="n">findLeft</span> <span class="n">p</span> <span class="n">loc1</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-10" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-10'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Find the next right sibling that satisfies a predicate.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">findRight</span> <span class="ow">::</span> <span class="p">(</span><span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Bool</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Cursor</span>
+<span class="nf">findRight</span> <span class="n">p</span> <span class="n">loc</span> <span class="ow">=</span> <span class="kr">do</span> <span class="n">loc1</span> <span class="ow">&lt;-</span> <span class="n">right</span> <span class="n">loc</span>
+                     <span class="kr">if</span> <span class="n">p</span> <span class="n">loc1</span> <span class="kr">then</span> <span class="n">return</span> <span class="n">loc1</span> <span class="kr">else</span> <span class="n">findRight</span> <span class="n">p</span> <span class="n">loc1</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-11" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-11'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>The first child that satisfies a predicate.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">findChild</span> <span class="ow">::</span> <span class="p">(</span><span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Bool</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Cursor</span>
+<span class="nf">findChild</span> <span class="n">p</span> <span class="n">loc</span> <span class="ow">=</span>
+  <span class="kr">do</span> <span class="n">loc1</span> <span class="ow">&lt;-</span> <span class="n">firstChild</span> <span class="n">loc</span>
+     <span class="kr">if</span> <span class="n">p</span> <span class="n">loc1</span> <span class="kr">then</span> <span class="n">return</span> <span class="n">loc1</span> <span class="kr">else</span> <span class="n">findRight</span> <span class="n">p</span> <span class="n">loc1</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-12" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-12'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>The next position in a left-to-right depth-first traversal of a document: either the first child, right sibling, or the right sibling of a parent that has one.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">nextDF</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Cursor</span>
+<span class="nf">nextDF</span> <span class="n">c</span> <span class="ow">=</span> <span class="n">firstChild</span> <span class="n">c</span> <span class="p">`</span><span class="n">mplus</span><span class="p">`</span> <span class="n">up</span> <span class="n">c</span>
+  <span class="kr">where</span> <span class="n">up</span> <span class="n">x</span> <span class="ow">=</span> <span class="n">right</span> <span class="n">x</span> <span class="p">`</span><span class="n">mplus</span><span class="p">`</span> <span class="p">(</span><span class="n">up</span> <span class="o">=&lt;&lt;</span> <span class="n">parent</span> <span class="n">x</span><span class="p">)</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-13" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-13'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Perform a depth first search for a descendant that satisfies the given predicate.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">findRec</span> <span class="ow">::</span> <span class="p">(</span><span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Bool</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Cursor</span>
+<span class="nf">findRec</span> <span class="n">p</span> <span class="n">c</span> <span class="ow">=</span> <span class="kr">if</span> <span class="n">p</span> <span class="n">c</span> <span class="kr">then</span> <span class="kt">Just</span> <span class="n">c</span> <span class="kr">else</span> <span class="n">findRec</span> <span class="n">p</span> <span class="o">=&lt;&lt;</span> <span class="n">nextDF</span> <span class="n">c</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-14" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-14'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>The child with the given index (starting from 0).</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">getChild</span> <span class="ow">::</span> <span class="kt">Int</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Cursor</span>
+<span class="nf">getChild</span> <span class="n">n</span> <span class="n">loc</span> <span class="ow">=</span>
+  <span class="kr">do</span> <span class="p">(</span><span class="n">ts</span><span class="p">,</span><span class="n">ps</span><span class="p">)</span> <span class="ow">&lt;-</span> <span class="n">downParents</span> <span class="n">loc</span>
+     <span class="p">(</span><span class="n">ls</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">rs</span><span class="p">)</span> <span class="ow">&lt;-</span> <span class="n">splitChildren</span> <span class="n">ts</span> <span class="n">n</span>
+     <span class="n">return</span> <span class="kt">Cur</span> <span class="p">{</span> <span class="n">current</span> <span class="ow">=</span> <span class="n">t</span><span class="p">,</span> <span class="n">lefts</span> <span class="ow">=</span> <span class="n">ls</span><span class="p">,</span> <span class="n">rights</span> <span class="ow">=</span> <span class="n">rs</span><span class="p">,</span> <span class="n">parents</span> <span class="ow">=</span> <span class="n">ps</span> <span class="p">}</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-15" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-15'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p><strong>private</strong>: computes the parent for &quot;down&quot; operations.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">downParents</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Maybe</span> <span class="p">([</span><span class="kt">Content</span><span class="p">],</span> <span class="kt">Path</span><span class="p">)</span>
+<span class="nf">downParents</span> <span class="n">loc</span> <span class="ow">=</span>
+  <span class="kr">case</span> <span class="n">current</span> <span class="n">loc</span> <span class="kr">of</span>
+    <span class="kt">Elem</span> <span class="n">e</span> <span class="ow">-&gt;</span> <span class="kt">Just</span> <span class="p">(</span> <span class="n">elContent</span> <span class="n">e</span>
+                   <span class="p">,</span> <span class="p">(</span><span class="n">lefts</span> <span class="n">loc</span><span class="p">,</span> <span class="n">getTag</span> <span class="n">e</span><span class="p">,</span> <span class="n">rights</span> <span class="n">loc</span><span class="p">)</span> <span class="kt">:</span> <span class="n">parents</span> <span class="n">loc</span>
+                   <span class="p">)</span>
+    <span class="kr">_</span>      <span class="ow">-&gt;</span> <span class="kt">Nothing</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-16" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-16'>#</a>
+          </div>
+          <h2><a id="conversions" class="header-anchor" href="#conversions"> Conversions </a></h2>
+        </div>
+        <div class='code'>
+          
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-17" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-17'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>A cursor for the given content.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">fromContent</span> <span class="ow">::</span> <span class="kt">Content</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span>
+<span class="nf">fromContent</span> <span class="n">t</span> <span class="ow">=</span> <span class="kt">Cur</span> <span class="p">{</span> <span class="n">current</span> <span class="ow">=</span> <span class="n">t</span><span class="p">,</span> <span class="n">lefts</span> <span class="ow">=</span> <span class="kt">[]</span><span class="p">,</span> <span class="n">rights</span> <span class="ow">=</span> <span class="kt">[]</span><span class="p">,</span> <span class="n">parents</span> <span class="ow">=</span> <span class="kt">[]</span> <span class="p">}</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-18" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-18'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>A cursor for the given element.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">fromElement</span> <span class="ow">::</span> <span class="kt">Element</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span>
+<span class="nf">fromElement</span> <span class="n">e</span> <span class="ow">=</span> <span class="n">fromContent</span> <span class="p">(</span><span class="kt">Elem</span> <span class="n">e</span><span class="p">)</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-19" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-19'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>The location of the first tree in a forest.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">fromForest</span> <span class="ow">::</span> <span class="p">[</span><span class="kt">Content</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Cursor</span>
+<span class="nf">fromForest</span> <span class="p">(</span><span class="n">t</span><span class="kt">:</span><span class="n">ts</span><span class="p">)</span> <span class="ow">=</span> <span class="kt">Just</span> <span class="kt">Cur</span> <span class="p">{</span> <span class="n">current</span> <span class="ow">=</span> <span class="n">t</span><span class="p">,</span> <span class="n">lefts</span> <span class="ow">=</span> <span class="kt">[]</span><span class="p">,</span> <span class="n">rights</span> <span class="ow">=</span> <span class="n">ts</span>
+                                                      <span class="p">,</span> <span class="n">parents</span> <span class="ow">=</span> <span class="kt">[]</span> <span class="p">}</span>
+<span class="nf">fromForest</span> <span class="kt">[]</span>     <span class="ow">=</span> <span class="kt">Nothing</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-20" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-20'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Computes the tree containing this location.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">toTree</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Content</span>
+<span class="nf">toTree</span> <span class="n">loc</span> <span class="ow">=</span> <span class="n">current</span> <span class="p">(</span><span class="n">root</span> <span class="n">loc</span><span class="p">)</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-21" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-21'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Computes the forest containing this location.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">toForest</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="kt">Content</span><span class="p">]</span>
+<span class="nf">toForest</span> <span class="n">loc</span> <span class="ow">=</span> <span class="kr">let</span> <span class="n">r</span> <span class="ow">=</span> <span class="n">root</span> <span class="n">loc</span> <span class="kr">in</span> <span class="n">combChildren</span> <span class="p">(</span><span class="n">lefts</span> <span class="n">r</span><span class="p">)</span> <span class="p">(</span><span class="n">current</span> <span class="n">r</span><span class="p">)</span> <span class="p">(</span><span class="n">rights</span> <span class="n">r</span><span class="p">)</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-22" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-22'>#</a>
+          </div>
+          <h2><a id="queries" class="header-anchor" href="#queries"> Queries</a></h2>
+        </div>
+        <div class='code'>
+          
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-23" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-23'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Are we at the top of the document?</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">isRoot</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Bool</span>
+<span class="nf">isRoot</span> <span class="n">loc</span> <span class="ow">=</span> <span class="n">null</span> <span class="p">(</span><span class="n">parents</span> <span class="n">loc</span><span class="p">)</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-24" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-24'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Are we at the left end of the the document?</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">isFirst</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Bool</span>
+<span class="nf">isFirst</span> <span class="n">loc</span> <span class="ow">=</span> <span class="n">null</span> <span class="p">(</span><span class="n">lefts</span> <span class="n">loc</span><span class="p">)</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-25" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-25'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Are we at the right end of the document?</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">isLast</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Bool</span>
+<span class="nf">isLast</span> <span class="n">loc</span> <span class="ow">=</span> <span class="n">null</span> <span class="p">(</span><span class="n">rights</span> <span class="n">loc</span><span class="p">)</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-26" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-26'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Are we at the bottom of the document?</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">isLeaf</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Bool</span>
+<span class="nf">isLeaf</span> <span class="n">loc</span> <span class="ow">=</span> <span class="n">isNothing</span> <span class="p">(</span><span class="n">downParents</span> <span class="n">loc</span><span class="p">)</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-27" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-27'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Do we have a parent?</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">isChild</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Bool</span>
+<span class="nf">isChild</span> <span class="n">loc</span> <span class="ow">=</span> <span class="n">not</span> <span class="p">(</span><span class="n">isRoot</span> <span class="n">loc</span><span class="p">)</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-28" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-28'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Get the node index inside the sequence of children</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">getNodeIndex</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Int</span>
+<span class="nf">getNodeIndex</span> <span class="n">loc</span> <span class="ow">=</span> <span class="n">length</span> <span class="p">(</span><span class="n">lefts</span> <span class="n">loc</span><span class="p">)</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-29" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-29'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Do we have children?</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">hasChildren</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Bool</span>
+<span class="nf">hasChildren</span> <span class="n">loc</span> <span class="ow">=</span> <span class="n">not</span> <span class="p">(</span><span class="n">isLeaf</span> <span class="n">loc</span><span class="p">)</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-30" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-30'>#</a>
+          </div>
+          <h2><a id="updates" class="header-anchor" href="#updates"> Updates</a></h2>
+        </div>
+        <div class='code'>
+          
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-31" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-31'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Change the current content.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">setContent</span> <span class="ow">::</span> <span class="kt">Content</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span>
+<span class="nf">setContent</span> <span class="n">t</span> <span class="n">loc</span> <span class="ow">=</span> <span class="n">loc</span> <span class="p">{</span> <span class="n">current</span> <span class="ow">=</span> <span class="n">t</span> <span class="p">}</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-32" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-32'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Modify the current content.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">modifyContent</span> <span class="ow">::</span> <span class="p">(</span><span class="kt">Content</span> <span class="ow">-&gt;</span> <span class="kt">Content</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span>
+<span class="nf">modifyContent</span> <span class="n">f</span> <span class="n">loc</span> <span class="ow">=</span> <span class="n">setContent</span> <span class="p">(</span><span class="n">f</span> <span class="p">(</span><span class="n">current</span> <span class="n">loc</span><span class="p">))</span> <span class="n">loc</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-33" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-33'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Modify the current content, allowing for an effect.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">modifyContentM</span> <span class="ow">::</span> <span class="kt">Monad</span> <span class="n">m</span> <span class="ow">=&gt;</span> <span class="p">(</span><span class="kt">Content</span> <span class="ow">-&gt;</span> <span class="n">m</span> <span class="kt">Content</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="n">m</span> <span class="kt">Cursor</span>
+<span class="nf">modifyContentM</span> <span class="n">f</span> <span class="n">loc</span> <span class="ow">=</span> <span class="kr">do</span> <span class="n">x</span> <span class="ow">&lt;-</span> <span class="n">f</span> <span class="p">(</span><span class="n">current</span> <span class="n">loc</span><span class="p">)</span>
+                          <span class="n">return</span> <span class="p">(</span><span class="n">setContent</span> <span class="n">x</span> <span class="n">loc</span><span class="p">)</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-34" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-34'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Insert content to the left of the current position.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">insertLeft</span> <span class="ow">::</span> <span class="kt">Content</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span>
+<span class="nf">insertLeft</span> <span class="n">t</span> <span class="n">loc</span> <span class="ow">=</span> <span class="n">loc</span> <span class="p">{</span> <span class="n">lefts</span> <span class="ow">=</span> <span class="n">t</span> <span class="kt">:</span> <span class="n">lefts</span> <span class="n">loc</span> <span class="p">}</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-35" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-35'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Insert content to the right of the current position.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">insertRight</span> <span class="ow">::</span> <span class="kt">Content</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span>
+<span class="nf">insertRight</span> <span class="n">t</span> <span class="n">loc</span> <span class="ow">=</span> <span class="n">loc</span> <span class="p">{</span> <span class="n">rights</span> <span class="ow">=</span> <span class="n">t</span> <span class="kt">:</span> <span class="n">rights</span> <span class="n">loc</span> <span class="p">}</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-36" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-36'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Remove the content on the left of the current position, if any.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">removeLeft</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Maybe</span> <span class="p">(</span><span class="kt">Content</span><span class="p">,</span><span class="kt">Cursor</span><span class="p">)</span>
+<span class="nf">removeLeft</span> <span class="n">loc</span> <span class="ow">=</span> <span class="kr">case</span> <span class="n">lefts</span> <span class="n">loc</span> <span class="kr">of</span>
+                   <span class="n">l</span> <span class="kt">:</span> <span class="n">ls</span> <span class="ow">-&gt;</span> <span class="n">return</span> <span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">loc</span> <span class="p">{</span> <span class="n">lefts</span> <span class="ow">=</span> <span class="n">ls</span> <span class="p">})</span>
+                   <span class="kt">[]</span> <span class="ow">-&gt;</span> <span class="kt">Nothing</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-37" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-37'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Remove the content on the right of the current position, if any.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">removeRight</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Maybe</span> <span class="p">(</span><span class="kt">Content</span><span class="p">,</span><span class="kt">Cursor</span><span class="p">)</span>
+<span class="nf">removeRight</span> <span class="n">loc</span> <span class="ow">=</span> <span class="kr">case</span> <span class="n">rights</span> <span class="n">loc</span> <span class="kr">of</span>
+                    <span class="n">l</span> <span class="kt">:</span> <span class="n">ls</span> <span class="ow">-&gt;</span> <span class="n">return</span> <span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">loc</span> <span class="p">{</span> <span class="n">rights</span> <span class="ow">=</span> <span class="n">ls</span> <span class="p">})</span>
+                    <span class="kt">[]</span> <span class="ow">-&gt;</span> <span class="kt">Nothing</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-38" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-38'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Insert content to the left of the current position. The new content becomes the current position.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">insertGoLeft</span> <span class="ow">::</span> <span class="kt">Content</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span>
+<span class="nf">insertGoLeft</span> <span class="n">t</span> <span class="n">loc</span> <span class="ow">=</span> <span class="n">loc</span> <span class="p">{</span> <span class="n">current</span> <span class="ow">=</span> <span class="n">t</span><span class="p">,</span> <span class="n">rights</span> <span class="ow">=</span> <span class="n">current</span> <span class="n">loc</span> <span class="kt">:</span> <span class="n">rights</span> <span class="n">loc</span> <span class="p">}</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-39" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-39'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Insert content to the right of the current position. The new content becomes the current position.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">insertGoRight</span> <span class="ow">::</span> <span class="kt">Content</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Cursor</span>
+<span class="nf">insertGoRight</span> <span class="n">t</span> <span class="n">loc</span> <span class="ow">=</span> <span class="n">loc</span> <span class="p">{</span> <span class="n">current</span> <span class="ow">=</span> <span class="n">t</span><span class="p">,</span> <span class="n">lefts</span> <span class="ow">=</span> <span class="n">current</span> <span class="n">loc</span> <span class="kt">:</span> <span class="n">lefts</span> <span class="n">loc</span> <span class="p">}</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-40" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-40'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Remove the current element. The new position is the one on the left.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">removeGoLeft</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Cursor</span>
+<span class="nf">removeGoLeft</span> <span class="n">loc</span> <span class="ow">=</span> <span class="kr">case</span> <span class="n">lefts</span> <span class="n">loc</span> <span class="kr">of</span>
+                     <span class="n">l</span> <span class="kt">:</span> <span class="n">ls</span> <span class="ow">-&gt;</span> <span class="kt">Just</span> <span class="n">loc</span> <span class="p">{</span> <span class="n">current</span> <span class="ow">=</span> <span class="n">l</span><span class="p">,</span> <span class="n">lefts</span> <span class="ow">=</span> <span class="n">ls</span> <span class="p">}</span>
+                     <span class="kt">[]</span>     <span class="ow">-&gt;</span> <span class="kt">Nothing</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-41" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-41'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Remove the current element. The new position is the one on the right.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">removeGoRight</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Cursor</span>
+<span class="nf">removeGoRight</span> <span class="n">loc</span> <span class="ow">=</span> <span class="kr">case</span> <span class="n">rights</span> <span class="n">loc</span> <span class="kr">of</span>
+                     <span class="n">l</span> <span class="kt">:</span> <span class="n">ls</span> <span class="ow">-&gt;</span> <span class="kt">Just</span> <span class="n">loc</span> <span class="p">{</span> <span class="n">current</span> <span class="ow">=</span> <span class="n">l</span><span class="p">,</span> <span class="n">rights</span> <span class="ow">=</span> <span class="n">ls</span> <span class="p">}</span>
+                     <span class="kt">[]</span>     <span class="ow">-&gt;</span> <span class="kt">Nothing</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-42" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-42'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Remove the current element. The new position is the parent of the old position.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">removeGoUp</span> <span class="ow">::</span> <span class="kt">Cursor</span> <span class="ow">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Cursor</span>
+<span class="nf">removeGoUp</span> <span class="n">loc</span> <span class="ow">=</span>
+  <span class="kr">case</span> <span class="n">parents</span> <span class="n">loc</span> <span class="kr">of</span>
+    <span class="p">(</span><span class="n">pls</span><span class="p">,</span><span class="n">v</span><span class="p">,</span><span class="n">prs</span><span class="p">)</span> <span class="kt">:</span> <span class="n">ps</span> <span class="ow">-&gt;</span> <span class="kt">Just</span>
+      <span class="kt">Cur</span> <span class="p">{</span> <span class="n">current</span> <span class="ow">=</span> <span class="kt">Elem</span> <span class="p">(</span><span class="n">fromTag</span> <span class="n">v</span> <span class="p">(</span><span class="n">reverse</span> <span class="p">(</span><span class="n">lefts</span> <span class="n">loc</span><span class="p">)</span> <span class="o">++</span> <span class="n">rights</span> <span class="n">loc</span><span class="p">))</span>
+          <span class="p">,</span> <span class="n">lefts</span> <span class="ow">=</span> <span class="n">pls</span><span class="p">,</span> <span class="n">rights</span> <span class="ow">=</span> <span class="n">prs</span><span class="p">,</span> <span class="n">parents</span> <span class="ow">=</span> <span class="n">ps</span>
+          <span class="p">}</span>
+    <span class="kt">[]</span> <span class="ow">-&gt;</span> <span class="kt">Nothing</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-43" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-43'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p><strong>private</strong>: Gets the given element of a list. Also returns the preceding elements (reversed) and the following elements.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">splitChildren</span> <span class="ow">::</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="kt">Int</span> <span class="ow">-&gt;</span> <span class="kt">Maybe</span> <span class="p">([</span><span class="n">a</span><span class="p">],</span><span class="n">a</span><span class="p">,[</span><span class="n">a</span><span class="p">])</span>
+<span class="nf">splitChildren</span> <span class="kr">_</span> <span class="n">n</span> <span class="o">|</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">=</span> <span class="kt">Nothing</span>
+<span class="nf">splitChildren</span> <span class="n">cs</span> <span class="n">pos</span> <span class="ow">=</span> <span class="n">loop</span> <span class="kt">[]</span> <span class="n">cs</span> <span class="n">pos</span>
+  <span class="kr">where</span> <span class="n">loop</span> <span class="n">acc</span> <span class="p">(</span><span class="n">x</span><span class="kt">:</span><span class="n">xs</span><span class="p">)</span> <span class="mi">0</span> <span class="ow">=</span> <span class="kt">Just</span> <span class="p">(</span><span class="n">acc</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">xs</span><span class="p">)</span>
+        <span class="n">loop</span> <span class="n">acc</span> <span class="p">(</span><span class="n">x</span><span class="kt">:</span><span class="n">xs</span><span class="p">)</span> <span class="n">n</span> <span class="ow">=</span> <span class="n">loop</span> <span class="p">(</span><span class="n">x</span><span class="kt">:</span><span class="n">acc</span><span class="p">)</span> <span class="n">xs</span> <span class="o">$!</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
+        <span class="n">loop</span> <span class="kr">_</span> <span class="kr">_</span> <span class="kr">_</span>        <span class="ow">=</span> <span class="kt">Nothing</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-44" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-44'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p><strong>private</strong>: <code>combChildren ls x ys = reverse ls ++ [x] ++ ys</code></p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">combChildren</span> <span class="ow">::</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="n">a</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span>
+<span class="nf">combChildren</span> <span class="n">ls</span> <span class="n">t</span> <span class="n">rs</span> <span class="ow">=</span> <span class="n">foldl</span> <span class="p">(</span><span class="n">flip</span> <span class="p">(</span><span class="kt">:</span><span class="p">))</span> <span class="p">(</span><span class="n">t</span><span class="kt">:</span><span class="n">rs</span><span class="p">)</span> <span class="n">ls</span>
+
+</pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+  </div>
+</body>

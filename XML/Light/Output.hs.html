@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title> documentation: XML/Light/Output.hs</title>
+  <link rel="stylesheet" href="../../pyccoon.css">
+</head>
+<body>
+<div id='container' >
+  <div id="footer">
+    <span id="project-name">
+        <a class="btn" href="../../index.html"> documentation</a>
+    </span>
+    <a class="btn" class="source source-1" href="#top">Back to top</a>
+    <div class="generation-time">
+        Generated at
+        <code>2015-06-21 20:44</code>
+        by a diligent
+        <a target="_blank" href="http://ckald.github.io/pyccoon/" title="Pyccoon: side-to-side documentation generator">
+            <img id="pyccoon-icon" src="../../pyccoon_icon.svg" alt="Pyccoon: side-to-side documentation generator" />pyccoon</a>
+    </div>
+  </div>
+  <a id="top"></a>
+  <div class='section'>
+    <div class='docs nav'>
+      <nav id="breadcrumbs">/ <a href="Output.hs.html/../../../index.html">.</a> / <a href="Output.hs.html/../../index.html">XML</a> / <a href="Output.hs.html/../index.html">Light</a> / Output.hs</nav>
+      <ul id="children"></ul>
+    </div>
+  </div>
+  <div id="everything" class='clearall'>
+    <div id="background"></div>
+    <div class='section'>
+    <a id="section-0" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-0'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p class="module-characteristic"><strong>Module</strong>: Text.XML.Light.Output</p><p class="module-characteristic"><strong>Copyright</strong>: (c) Galois, Inc. 2007</p><p class="module-characteristic"><strong>License</strong>: BSD3</p><p class="module-characteristic"><strong>Maintainer</strong>: Iavor S. Diatchki <diatchki@galois.com></p><p class="module-characteristic"><strong>Stability</strong>: provisional</p><p class="module-characteristic"><strong>Portability</strong>: </p>
+<p>Output handling for the lightweight XML lib.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="kr">module</span> <span class="nn">Text.XML.Light.Output</span>
+  <span class="p">(</span> <span class="nf">showTopElement</span><span class="p">,</span> <span class="nf">showContent</span><span class="p">,</span> <span class="nf">showElement</span><span class="p">,</span> <span class="nf">showCData</span><span class="p">,</span> <span class="nf">showQName</span><span class="p">,</span> <span class="nf">showAttr</span>
+  <span class="p">,</span> <span class="nf">ppTopElement</span><span class="p">,</span> <span class="nf">ppContent</span><span class="p">,</span> <span class="nf">ppElement</span>
+  <span class="p">,</span> <span class="nf">ppcTopElement</span><span class="p">,</span> <span class="nf">ppcContent</span><span class="p">,</span> <span class="nf">ppcElement</span>
+  <span class="p">,</span> <span class="kt">ConfigPP</span>
+  <span class="p">,</span> <span class="nf">defaultConfigPP</span><span class="p">,</span> <span class="nf">prettyConfigPP</span>
+  <span class="p">,</span> <span class="nf">useShortEmptyTags</span><span class="p">,</span> <span class="nf">useExtraWhiteSpace</span>
+  <span class="p">,</span> <span class="nf">tagEnd</span><span class="p">,</span> <span class="nf">xml_header</span>
+  <span class="p">)</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Text.XML.Light.Types</span>
+<span class="kr">import</span> <span class="nn">Data.Char</span>
+<span class="kr">import</span> <span class="nn">Data.List</span> <span class="p">(</span> <span class="nf">isPrefixOf</span> <span class="p">)</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-1" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-1'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>The XML 1.0 header</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">xml_header</span> <span class="ow">::</span> <span class="kt">String</span>
+<span class="nf">xml_header</span> <span class="ow">=</span> <span class="s">&quot;&lt;?xml version=&#39;1.0&#39; ?&gt;&quot;</span>
+
+
+<span class="kr">data</span> <span class="kt">ConfigPP</span> <span class="ow">=</span> <span class="kt">ConfigPP</span>
+  <span class="p">{</span> <span class="n">shortEmptyTag</span> <span class="ow">::</span> <span class="kt">QName</span> <span class="ow">-&gt;</span> <span class="kt">Bool</span>
+  <span class="p">,</span> <span class="n">prettify</span>      <span class="ow">::</span> <span class="kt">Bool</span>
+  <span class="p">}</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-2" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-2'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Default pretty orinting configuration.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="c1">--  Always use abbreviate empty tags.</span>
+<span class="nf">defaultConfigPP</span> <span class="ow">::</span> <span class="kt">ConfigPP</span>
+<span class="nf">defaultConfigPP</span> <span class="ow">=</span> <span class="kt">ConfigPP</span> <span class="p">{</span> <span class="n">shortEmptyTag</span> <span class="ow">=</span> <span class="n">const</span> <span class="kt">True</span>
+                           <span class="p">,</span> <span class="n">prettify</span>      <span class="ow">=</span> <span class="kt">False</span>
+                           <span class="p">}</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-3" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-3'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>The predicate specifies for which empty tags we should use XML's abbreviated notation <a href="TAG" title="TAG">/</a>. This is useful if we are working with some XML-ish standards (such as certain versions of HTML) where some empty tags should always be displayed in the <a href="TAG" class="uri" title="TAG">TAG</a><a href="/TAG" class="uri" title="/TAG">/TAG</a> form.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">useShortEmptyTags</span> <span class="ow">::</span> <span class="p">(</span><span class="kt">QName</span> <span class="ow">-&gt;</span> <span class="kt">Bool</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="kt">ConfigPP</span> <span class="ow">-&gt;</span> <span class="kt">ConfigPP</span>
+<span class="nf">useShortEmptyTags</span> <span class="n">p</span> <span class="n">c</span> <span class="ow">=</span> <span class="n">c</span> <span class="p">{</span> <span class="n">shortEmptyTag</span> <span class="ow">=</span> <span class="n">p</span> <span class="p">}</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-4" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-4'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Specify if we should use extra white-space to make document more readable. WARNING: This adds additional white-space to text elements, and so it may change the meaning of the document.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">useExtraWhiteSpace</span> <span class="ow">::</span> <span class="kt">Bool</span> <span class="ow">-&gt;</span> <span class="kt">ConfigPP</span> <span class="ow">-&gt;</span> <span class="kt">ConfigPP</span>
+<span class="nf">useExtraWhiteSpace</span> <span class="n">p</span> <span class="n">c</span>  <span class="ow">=</span> <span class="n">c</span> <span class="p">{</span> <span class="n">prettify</span> <span class="ow">=</span> <span class="n">p</span> <span class="p">}</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-5" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-5'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>A configuration that tries to make things pretty (possibly at the cost of changing the semantics a bit through adding white space.)</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">prettyConfigPP</span>     <span class="ow">::</span> <span class="kt">ConfigPP</span>
+<span class="nf">prettyConfigPP</span>      <span class="ow">=</span> <span class="n">useExtraWhiteSpace</span> <span class="kt">True</span> <span class="n">defaultConfigPP</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-6" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-6'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Pretty printing renders XML documents faithfully, with the exception that whitespace may be added/removed in non-verbatim character data.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">ppTopElement</span>       <span class="ow">::</span> <span class="kt">Element</span> <span class="ow">-&gt;</span> <span class="kt">String</span>
+<span class="nf">ppTopElement</span>        <span class="ow">=</span> <span class="n">ppcTopElement</span> <span class="n">prettyConfigPP</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-7" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-7'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Pretty printing elements</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">ppElement</span>          <span class="ow">::</span> <span class="kt">Element</span> <span class="ow">-&gt;</span> <span class="kt">String</span>
+<span class="nf">ppElement</span>           <span class="ow">=</span> <span class="n">ppcElement</span> <span class="n">prettyConfigPP</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-8" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-8'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Pretty printing content</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">ppContent</span>          <span class="ow">::</span> <span class="kt">Content</span> <span class="ow">-&gt;</span> <span class="kt">String</span>
+<span class="nf">ppContent</span>           <span class="ow">=</span> <span class="n">ppcContent</span> <span class="n">prettyConfigPP</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-9" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-9'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Pretty printing renders XML documents faithfully, with the exception that whitespace may be added/removed in non-verbatim character data.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">ppcTopElement</span>      <span class="ow">::</span> <span class="kt">ConfigPP</span> <span class="ow">-&gt;</span> <span class="kt">Element</span> <span class="ow">-&gt;</span> <span class="kt">String</span>
+<span class="nf">ppcTopElement</span> <span class="n">c</span> <span class="n">e</span>   <span class="ow">=</span> <span class="n">unlines</span> <span class="p">[</span><span class="n">xml_header</span><span class="p">,</span><span class="n">ppcElement</span> <span class="n">c</span> <span class="n">e</span><span class="p">]</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-10" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-10'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Pretty printing elements</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">ppcElement</span>         <span class="ow">::</span> <span class="kt">ConfigPP</span> <span class="ow">-&gt;</span> <span class="kt">Element</span> <span class="ow">-&gt;</span> <span class="kt">String</span>
+<span class="nf">ppcElement</span> <span class="n">c</span> <span class="n">e</span>      <span class="ow">=</span> <span class="n">ppElementS</span> <span class="n">c</span> <span class="s">&quot;&quot;</span> <span class="n">e</span> <span class="s">&quot;&quot;</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-11" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-11'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Pretty printing content</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">ppcContent</span>         <span class="ow">::</span> <span class="kt">ConfigPP</span> <span class="ow">-&gt;</span> <span class="kt">Content</span> <span class="ow">-&gt;</span> <span class="kt">String</span>
+<span class="nf">ppcContent</span> <span class="n">c</span> <span class="n">x</span>      <span class="ow">=</span> <span class="n">ppContentS</span> <span class="n">c</span> <span class="s">&quot;&quot;</span> <span class="n">x</span> <span class="s">&quot;&quot;</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-12" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-12'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Pretty printing content using ShowS</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">ppContentS</span>         <span class="ow">::</span> <span class="kt">ConfigPP</span> <span class="ow">-&gt;</span> <span class="kt">String</span> <span class="ow">-&gt;</span> <span class="kt">Content</span> <span class="ow">-&gt;</span> <span class="kt">ShowS</span>
+<span class="nf">ppContentS</span> <span class="n">c</span> <span class="n">i</span> <span class="n">x</span> <span class="n">xs</span> <span class="ow">=</span> <span class="kr">case</span> <span class="n">x</span> <span class="kr">of</span>
+                        <span class="kt">Elem</span> <span class="n">e</span> <span class="ow">-&gt;</span> <span class="n">ppElementS</span> <span class="n">c</span> <span class="n">i</span> <span class="n">e</span> <span class="n">xs</span>
+                        <span class="kt">Text</span> <span class="n">t</span> <span class="ow">-&gt;</span> <span class="n">ppCDataS</span> <span class="n">c</span> <span class="n">i</span> <span class="n">t</span> <span class="n">xs</span>
+                        <span class="kt">CRef</span> <span class="n">r</span> <span class="ow">-&gt;</span> <span class="n">showCRefS</span> <span class="n">r</span> <span class="n">xs</span>
+
+<span class="nf">ppElementS</span>         <span class="ow">::</span> <span class="kt">ConfigPP</span> <span class="ow">-&gt;</span> <span class="kt">String</span> <span class="ow">-&gt;</span> <span class="kt">Element</span> <span class="ow">-&gt;</span> <span class="kt">ShowS</span>
+<span class="nf">ppElementS</span> <span class="n">c</span> <span class="n">i</span> <span class="n">e</span> <span class="n">xs</span> <span class="ow">=</span> <span class="n">i</span> <span class="o">++</span> <span class="p">(</span><span class="n">tagStart</span> <span class="p">(</span><span class="n">elName</span> <span class="n">e</span><span class="p">)</span> <span class="p">(</span><span class="n">elAttribs</span> <span class="n">e</span><span class="p">)</span> <span class="o">$</span>
+  <span class="kr">case</span> <span class="n">elContent</span> <span class="n">e</span> <span class="kr">of</span>
+    <span class="kt">[]</span> <span class="o">|</span> <span class="s">&quot;?&quot;</span> <span class="p">`</span><span class="n">isPrefixOf</span><span class="p">`</span> <span class="n">qName</span> <span class="n">name</span> <span class="ow">-&gt;</span> <span class="s">&quot; ?&gt;&quot;</span> <span class="o">++</span> <span class="n">xs</span>
+       <span class="o">|</span> <span class="n">shortEmptyTag</span> <span class="n">c</span> <span class="n">name</span>  <span class="ow">-&gt;</span> <span class="s">&quot; /&gt;&quot;</span> <span class="o">++</span> <span class="n">xs</span>
+    <span class="p">[</span><span class="kt">Text</span> <span class="n">t</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="s">&quot;&gt;&quot;</span> <span class="o">++</span> <span class="n">ppCDataS</span> <span class="n">c</span> <span class="s">&quot;&quot;</span> <span class="n">t</span> <span class="p">(</span><span class="n">tagEnd</span> <span class="n">name</span> <span class="n">xs</span><span class="p">)</span>
+    <span class="n">cs</span> <span class="ow">-&gt;</span> <span class="sc">&#39;&gt;&#39;</span> <span class="kt">:</span> <span class="n">nl</span> <span class="o">++</span> <span class="n">foldr</span> <span class="n">ppSub</span> <span class="p">(</span><span class="n">i</span> <span class="o">++</span> <span class="n">tagEnd</span> <span class="n">name</span> <span class="n">xs</span><span class="p">)</span> <span class="n">cs</span>
+      <span class="kr">where</span> <span class="n">ppSub</span> <span class="n">e1</span> <span class="ow">=</span> <span class="n">ppContentS</span> <span class="n">c</span> <span class="p">(</span><span class="n">sp</span> <span class="o">++</span> <span class="n">i</span><span class="p">)</span> <span class="n">e1</span> <span class="o">.</span> <span class="n">showString</span> <span class="n">nl</span>
+            <span class="p">(</span><span class="n">nl</span><span class="p">,</span><span class="n">sp</span><span class="p">)</span>  <span class="ow">=</span> <span class="kr">if</span> <span class="n">prettify</span> <span class="n">c</span> <span class="kr">then</span> <span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="s">&quot;  &quot;</span><span class="p">)</span> <span class="kr">else</span> <span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+  <span class="p">)</span>
+  <span class="kr">where</span> <span class="n">name</span> <span class="ow">=</span> <span class="n">elName</span> <span class="n">e</span>
+
+<span class="nf">ppCDataS</span>           <span class="ow">::</span> <span class="kt">ConfigPP</span> <span class="ow">-&gt;</span> <span class="kt">String</span> <span class="ow">-&gt;</span> <span class="kt">CData</span> <span class="ow">-&gt;</span> <span class="kt">ShowS</span>
+<span class="nf">ppCDataS</span> <span class="n">c</span> <span class="n">i</span> <span class="n">t</span> <span class="n">xs</span>   <span class="ow">=</span> <span class="n">i</span> <span class="o">++</span> <span class="kr">if</span> <span class="n">cdVerbatim</span> <span class="n">t</span> <span class="o">/=</span> <span class="kt">CDataText</span> <span class="o">||</span> <span class="n">not</span> <span class="p">(</span><span class="n">prettify</span> <span class="n">c</span><span class="p">)</span>
+                             <span class="kr">then</span> <span class="n">showCDataS</span> <span class="n">t</span> <span class="n">xs</span>
+                             <span class="kr">else</span> <span class="n">foldr</span> <span class="n">cons</span> <span class="n">xs</span> <span class="p">(</span><span class="n">showCData</span> <span class="n">t</span><span class="p">)</span>
+
+  <span class="kr">where</span> <span class="n">cons</span>         <span class="ow">::</span> <span class="kt">Char</span> <span class="ow">-&gt;</span> <span class="kt">String</span> <span class="ow">-&gt;</span> <span class="kt">String</span>
+        <span class="n">cons</span> <span class="sc">&#39;</span><span class="se">\n</span><span class="sc">&#39;</span> <span class="n">ys</span>  <span class="ow">=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">++</span> <span class="n">i</span> <span class="o">++</span> <span class="n">ys</span>
+        <span class="n">cons</span> <span class="n">y</span> <span class="n">ys</span>     <span class="ow">=</span> <span class="n">y</span> <span class="kt">:</span> <span class="n">ys</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-13" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-13'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Adds the <a href="?xml?" class="uri" title="?xml?">?xml?</a> header.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">showTopElement</span>     <span class="ow">::</span> <span class="kt">Element</span> <span class="ow">-&gt;</span> <span class="kt">String</span>
+<span class="nf">showTopElement</span> <span class="n">c</span>    <span class="ow">=</span> <span class="n">xml_header</span> <span class="o">++</span> <span class="n">showElement</span> <span class="n">c</span>
+
+<span class="nf">showContent</span>        <span class="ow">::</span> <span class="kt">Content</span> <span class="ow">-&gt;</span> <span class="kt">String</span>
+<span class="nf">showContent</span> <span class="n">c</span>       <span class="ow">=</span> <span class="n">ppContentS</span> <span class="n">defaultConfigPP</span> <span class="s">&quot;&quot;</span> <span class="n">c</span> <span class="s">&quot;&quot;</span>
+
+<span class="nf">showElement</span>        <span class="ow">::</span> <span class="kt">Element</span> <span class="ow">-&gt;</span> <span class="kt">String</span>
+<span class="nf">showElement</span> <span class="n">c</span>       <span class="ow">=</span> <span class="n">ppElementS</span> <span class="n">defaultConfigPP</span> <span class="s">&quot;&quot;</span> <span class="n">c</span> <span class="s">&quot;&quot;</span>
+
+<span class="nf">showCData</span>          <span class="ow">::</span> <span class="kt">CData</span> <span class="ow">-&gt;</span> <span class="kt">String</span>
+<span class="nf">showCData</span> <span class="n">c</span>         <span class="ow">=</span> <span class="n">ppCDataS</span> <span class="n">defaultConfigPP</span> <span class="s">&quot;&quot;</span> <span class="n">c</span> <span class="s">&quot;&quot;</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-14" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-14'>#</a>
+          </div>
+          <p>Note: crefs should not contain '&amp;', ';', etc.</p>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">showCRefS</span>          <span class="ow">::</span> <span class="kt">String</span> <span class="ow">-&gt;</span> <span class="kt">ShowS</span>
+<span class="nf">showCRefS</span> <span class="n">r</span> <span class="n">xs</span>      <span class="ow">=</span> <span class="sc">&#39;&amp;&#39;</span> <span class="kt">:</span> <span class="n">r</span> <span class="o">++</span> <span class="sc">&#39;;&#39;</span> <span class="kt">:</span> <span class="n">xs</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-15" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-15'>#</a>
+          </div>
+          <div class="haddock">
+  <div class="haddock-header">
+    Haddock:
+  </div>
+  <div class="haddock-text">
+    <p>Convert a text element to characters.</p>
+
+  </div>
+
+</div>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre><span class="nf">showCDataS</span>         <span class="ow">::</span> <span class="kt">CData</span> <span class="ow">-&gt;</span> <span class="kt">ShowS</span>
+<span class="nf">showCDataS</span> <span class="n">cd</span> <span class="ow">=</span>
+ <span class="kr">case</span> <span class="n">cdVerbatim</span> <span class="n">cd</span> <span class="kr">of</span>
+   <span class="kt">CDataText</span>     <span class="ow">-&gt;</span> <span class="n">escStr</span> <span class="p">(</span><span class="n">cdData</span> <span class="n">cd</span><span class="p">)</span>
+   <span class="kt">CDataVerbatim</span> <span class="ow">-&gt;</span> <span class="n">showString</span> <span class="s">&quot;&lt;![CDATA[&quot;</span> <span class="o">.</span> <span class="n">escCData</span> <span class="p">(</span><span class="n">cdData</span> <span class="n">cd</span><span class="p">)</span>
+                                           <span class="o">.</span> <span class="n">showString</span> <span class="s">&quot;]]&gt;&quot;</span>
+   <span class="kt">CDataRaw</span>      <span class="ow">-&gt;</span> <span class="nf">\</span> <span class="n">xs</span> <span class="ow">-&gt;</span> <span class="n">cdData</span> <span class="n">cd</span> <span class="o">++</span> <span class="n">xs</span>
+
+<span class="nf">escCData</span>           <span class="ow">::</span> <span class="kt">String</span> <span class="ow">-&gt;</span> <span class="kt">ShowS</span>
+<span class="nf">escCData</span> <span class="p">(</span><span class="sc">&#39;]&#39;</span> <span class="kt">:</span> <span class="sc">&#39;]&#39;</span> <span class="kt">:</span> <span class="sc">&#39;&gt;&#39;</span> <span class="kt">:</span> <span class="n">cs</span><span class="p">)</span> <span class="ow">=</span> <span class="n">showString</span> <span class="s">&quot;]]]]&gt;&lt;![CDATA[&gt;&quot;</span> <span class="o">.</span> <span class="n">escCData</span> <span class="n">cs</span>
+<span class="nf">escCData</span> <span class="p">(</span><span class="n">c</span> <span class="kt">:</span> <span class="n">cs</span><span class="p">)</span>               <span class="ow">=</span> <span class="n">showChar</span> <span class="n">c</span> <span class="o">.</span> <span class="n">escCData</span> <span class="n">cs</span>
+<span class="nf">escCData</span> <span class="kt">[]</span>                     <span class="ow">=</span> <span class="n">id</span>
+
+<span class="nf">escChar</span>            <span class="ow">::</span> <span class="kt">Char</span> <span class="ow">-&gt;</span> <span class="kt">ShowS</span>
+<span class="nf">escChar</span> <span class="n">c</span> <span class="ow">=</span> <span class="kr">case</span> <span class="n">c</span> <span class="kr">of</span>
+  <span class="sc">&#39;&lt;&#39;</span>   <span class="ow">-&gt;</span> <span class="n">showString</span> <span class="s">&quot;&amp;lt;&quot;</span>
+  <span class="sc">&#39;&gt;&#39;</span>   <span class="ow">-&gt;</span> <span class="n">showString</span> <span class="s">&quot;&amp;gt;&quot;</span>
+  <span class="sc">&#39;&amp;&#39;</span>   <span class="ow">-&gt;</span> <span class="n">showString</span> <span class="s">&quot;&amp;amp;&quot;</span>
+  <span class="sc">&#39;&quot;&#39;</span>   <span class="ow">-&gt;</span> <span class="n">showString</span> <span class="s">&quot;&amp;quot;&quot;</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-16" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-16'>#</a>
+          </div>
+          <p>we use &amp;#39 instead of &apos; because IE apparently has difficulties
+rendering &apos; in xhtml.
+Reported by Rohan Drape <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#114;&#111;&#104;&#97;&#110;&#46;&#100;&#114;&#97;&#112;&#101;&#64;&#103;&#109;&#97;&#105;&#108;&#46;&#99;&#111;&#109;">&#114;&#111;&#104;&#97;&#110;&#46;&#100;&#114;&#97;&#112;&#101;&#64;&#103;&#109;&#97;&#105;&#108;&#46;&#99;&#111;&#109;</a>.</p>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre>  <span class="sc">&#39;</span><span class="se">\&#39;</span><span class="sc">&#39;</span>  <span class="ow">-&gt;</span> <span class="n">showString</span> <span class="s">&quot;&amp;#39;&quot;</span></pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+    <div class='section'>
+    <a id="section-17" class="section-anchor"></a>
+    <section>
+        <div class='docs'>
+          <div class='octowrap'>
+            <a class='octothorpe' href='#section-17'>#</a>
+          </div>
+          <p>NOTE: We escape '\r' explicitly because otherwise they get lost
+when parsed back in because of then end-of-line normalization rules.</p>
+        </div>
+        <div class='code'>
+          <div class="highlight"><pre>  <span class="kr">_</span> <span class="o">|</span> <span class="n">isPrint</span> <span class="n">c</span> <span class="o">||</span> <span class="n">c</span> <span class="o">==</span> <span class="sc">&#39;</span><span class="se">\n</span><span class="sc">&#39;</span> <span class="ow">-&gt;</span> <span class="n">showChar</span> <span class="n">c</span>
+    <span class="o">|</span> <span class="n">otherwise</span> <span class="ow">-&gt;</span> <span class="n">showString</span> <span class="s">&quot;&amp;#&quot;</span> <span class="o">.</span> <span class="n">shows</span> <span class="n">oc</span> <span class="o">.</span> <span class="n">showChar</span> <span class="sc">&#39;;&#39;</span>
+      <span class="kr">where</span> <span class="n">oc</span> <span class="ow">=</span> <span class="n">ord</span> <span class="n">c</span>
+
+<span class="nf">escStr</span>             <span class="ow">::</span> <span class="kt">String</span> <span class="ow">-&gt;</span> <span class="kt">ShowS</span>
+<span class="nf">escStr</span> <span class="n">cs</span> <span class="n">rs</span>        <span class="ow">=</span> <span class="n">foldr</span> <span class="n">escChar</span> <span class="n">rs</span> <span class="n">cs</span>
+
+<span class="nf">tagEnd</span>             <span class="ow">::</span> <span class="kt">QName</span> <span class="ow">-&gt;</span> <span class="kt">ShowS</span>
+<span class="nf">tagEnd</span> <span class="n">qn</span> <span class="n">rs</span>        <span class="ow">=</span> <span class="sc">&#39;&lt;&#39;</span><span class="kt">:</span><span class="sc">&#39;/&#39;</span><span class="kt">:</span><span class="n">showQName</span> <span class="n">qn</span> <span class="o">++</span> <span class="sc">&#39;&gt;&#39;</span><span class="kt">:</span><span class="n">rs</span>
+
+<span class="nf">tagStart</span>           <span class="ow">::</span> <span class="kt">QName</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="kt">Attr</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="kt">ShowS</span>
+<span class="nf">tagStart</span> <span class="n">qn</span> <span class="n">as</span> <span class="n">rs</span>   <span class="ow">=</span> <span class="sc">&#39;&lt;&#39;</span><span class="kt">:</span><span class="n">showQName</span> <span class="n">qn</span> <span class="o">++</span> <span class="n">as_str</span> <span class="o">++</span> <span class="n">rs</span>
+ <span class="kr">where</span> <span class="n">as_str</span>       <span class="ow">=</span> <span class="kr">if</span> <span class="n">null</span> <span class="n">as</span> <span class="kr">then</span> <span class="s">&quot;&quot;</span> <span class="kr">else</span> <span class="sc">&#39; &#39;</span> <span class="kt">:</span> <span class="n">unwords</span> <span class="p">(</span><span class="n">map</span> <span class="n">showAttr</span> <span class="n">as</span><span class="p">)</span>
+
+<span class="nf">showAttr</span>           <span class="ow">::</span> <span class="kt">Attr</span> <span class="ow">-&gt;</span> <span class="kt">String</span>
+<span class="nf">showAttr</span> <span class="p">(</span><span class="kt">Attr</span> <span class="n">qn</span> <span class="n">v</span><span class="p">)</span> <span class="ow">=</span> <span class="n">showQName</span> <span class="n">qn</span> <span class="o">++</span> <span class="sc">&#39;=&#39;</span> <span class="kt">:</span> <span class="sc">&#39;&quot;&#39;</span> <span class="kt">:</span> <span class="n">escStr</span> <span class="n">v</span> <span class="s">&quot;</span><span class="se">\&quot;</span><span class="s">&quot;</span>
+
+<span class="nf">showQName</span>          <span class="ow">::</span> <span class="kt">QName</span> <span class="ow">-&gt;</span> <span class="kt">String</span>
+<span class="nf">showQName</span> <span class="n">q</span>         <span class="ow">=</span> <span class="n">pre</span> <span class="o">++</span> <span class="n">qName</span> <span class="n">q</span>
+  <span class="kr">where</span> <span class="n">pre</span> <span class="ow">=</span> <span class="kr">case</span> <span class="n">qPrefix</span> <span class="n">q</span> <span class="kr">of</span>
+                <span class="kt">Nothing</span> <span class="ow">-&gt;</span> <span class="s">&quot;&quot;</span>
+                <span class="kt">Just</span> <span class="n">p</span>  <span class="ow">-&gt;</span> <span class="n">p</span> <span class="o">++</span> <span class="s">&quot;:&quot;</span>
+
+</pre></div>
+        </div>
+        <div class='clearall'></div>
+    </section>
+    </div>
+  </div>
+</body>
